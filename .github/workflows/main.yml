@@ -42,6 +42,7 @@ on:
           - Official
           - Next
           - MKSU
+          - KowSU
         default: SukiSU
       kernelsu_branch:
         description: "KSU 分支"
@@ -247,6 +248,7 @@ jobs:
             "MKSU")      KSU_NAME="MKSU" ;;
             "SukiSU")    KSU_NAME="SukiSU" ;;
             "ReSukiSU")  KSU_NAME="ReSukiSU" ;;
+            "KowSU")     KSU_NAME="KowSU" ;;
           esac
           echo "KSU_NAME=$KSU_NAME" >> $GITHUB_ENV
 
@@ -316,7 +318,7 @@ jobs:
         if: inputs.kernelsu_branch == 'Dev(开发)' || inputs.kernelsu_variant == 'MKSU' || inputs.kernelsu_variant == 'SukiSU' || inputs.kernelsu_variant == 'ReSukiSU'
         run: |
           case "${{ inputs.kernelsu_variant }}" in
-            "Official"|"MKSU") BRANCH="main" ;;
+            "Official"|"MKSU"|"KowSU") BRANCH="main" ;;
             "SukiSU"|"ReSukiSU") BRANCH="main" ;;
             "Next") BRANCH="dev" ;;
             *) echo "错误: 未知变体" >&2; exit 1 ;;
@@ -333,6 +335,7 @@ jobs:
             "MKSU") REPO_URL="https://github.com/5ec1cff/KernelSU.git"; REPO_URL2="5ec1cff/KernelSU" ;;
             "SukiSU") REPO_URL="https://github.com/SukiSU-Ultra/SukiSU-Ultra.git"; REPO_URL2="SukiSU-Ultra/SukiSU-Ultra" ;;
             "ReSukiSU") REPO_URL="https://github.com/ReSukiSU/ReSukiSU.git"; REPO_URL2="ReSukiSU/ReSukiSU" ;;
+            "KowSU") REPO_URL="https://github.com/KOWX712/KernelSU.git"; REPO_URL2="KOWX712/KernelSU" ;;
           esac
 
           if [[ "${{ inputs.kernelsu_branch }}" == "Stable(标准)" && "${{ inputs.kernelsu_variant }}" != "MKSU" ]]; then
