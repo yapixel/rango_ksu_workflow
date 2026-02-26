@@ -17,8 +17,8 @@ on:
           - MKSU
           - SukiSU
           - ReSukiSU
-          - KowSU
-        default: SukiSU
+          - MidoriSU
+        default: MidoriSU
       kernelsu_branch:
         description: "KSU 分支"
         required: true
@@ -32,31 +32,32 @@ on:
         description: "自定义版本名 (可选)"
         required: false
         type: string
+        default: "-gki-midori-build"
       build_time:
         description: "自定义构建时间 (可选，N或留空=当前UTC)"
         required: false
         type: string
-        default: "Sun Dec 01 08:10:00 UTC 2024"
+        default: "N"
       use_zram:
         description: "启用 ZRAM 增强算法"
         required: true
         type: boolean
-        default: true
+        default: false
       use_bbg:
         description: "启用 BBG 防格机"
         required: true
         type: boolean
-        default: true
+        default: false
       use_kpm:
         description: "启用 KPM 功能"
         required: true
         type: boolean
-        default: true
+        default: false
       cancel_susfs:
         description: "禁用 SUSFS"
         required: true
         type: boolean
-        default: false
+        default: true
       supp_op:
         description: "启用一加 8E 支持"
         required: false
