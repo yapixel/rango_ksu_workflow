@@ -55,8 +55,8 @@ on:
           - MKSU
           - SukiSU
           - ReSukiSU
-          - KowSU
-        default: KowSU
+          - MidoriSU
+        default: MidoriSU
       kernelsu_branch:
         description: "KSU 分支"
         required: true
@@ -72,12 +72,12 @@ on:
         description: "自定义版本名 (可选)"
         required: false
         type: string
-        default: "-midori-build"
+        default: "-gki-midori-build"
       build_time:
         description: "自定义构建时间 (可选，N或留空=当前UTC)"
         required: false
         type: string
-        default: "Sun Jun 04 09:09:06 UTC 1989"
+        default: "N"
 
       # ==================== 功能开关 ====================
       use_zram:
