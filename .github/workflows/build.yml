@@ -825,27 +825,6 @@ jobs:
           # 小米：补充符号（幂等）
           ensure_line_once "$XIAOMI_SYMBOL_LIST" "device_find_any_child"
 
-      # ==================== 配置 Rust Binder (6.12+) ====================
-      # Android 16 (6.12) 引入 Rust binder 模块，需要安装 Rust 工具链
-      - name: 配置 Rust Binder
-        working-directory: ${{ env.KERNEL_ROOT }}
-        run: |
-          if [ -f common/drivers/android/binder/Makefile ]; then
-            # 6.12+：binder 独立子目录，强制编译 rust_binder 模块
-            perl -i -0777 -pe 's/\$\(\s*CONFIG_ANDROID_BINDER_IPC_RUST\s*\)/m/' common/drivers/android/binder/Makefile
-            perl -i -pe 's/^rust_binder-\$\([^)]+\)\s*:=/rust_binder-y :=/' common/drivers/android/binder/Makefile
-            echo "=== binder/Makefile ==="
-            cat common/drivers/android/binder/Makefile
-            # 安装 Rust nightly 工具链
-            rustup set profile minimal
-            rustup update nightly
-            rustup default nightly
-            rustup target add aarch64-unknown-none
-          else
-            # 旧版本：binder 在 drivers/android/Makefile
-            perl -i -0777 -pe 's/\$\(\s*CONFIG_ANDROID_BINDER_IPC_RUST\s*\)/m/' common/drivers/android/Makefile 2>/dev/null || true
-          fi
-
       # ==================== 备份原始 defconfig ====================
       # 用于后续生成 defconfig fragment（bazel trim 兼容）
       - name: 备份原始 defconfig
@@ -951,6 +930,7 @@ jobs:
           else
             # 配置 6.1+ 内核
             sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' ./common/BUILD.bazel
+            sed -i '/kmi_symbol_list_strict_mode/d' ./common/BUILD.bazel
             rm -rf ./common/android/abi_gki_protected_exports_*
             sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
           fi
@@ -958,7 +938,7 @@ jobs:
           # 配置内核名称
           if [ -n "${{ inputs.version }}" ]; then
             CLEAN_VERSION=$(echo "${{ inputs.version }}" | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+//')
-            sed -i '$s|echo "\$res"|echo "'"$CLEAN_VERSION"'"|' ./common/scripts/setlocalversion
+            sed -i '$s/^echo .*/echo "'"$CLEAN_VERSION"'"/' ./common/scripts/setlocalversion
             sed -i '/^CONFIG_LOCALVERSION=/ s/="\([^"]*\)"/="'"$CLEAN_VERSION"'"/' ./common/arch/arm64/configs/gki_defconfig
           elif [ ! -f "build/build.sh" ]; then
             cd ./common
@@ -978,7 +958,7 @@ jobs:
               sed -i "\$s|echo \"\$res\"|echo \"${KMI_LOCAL}\"|" ./scripts/setlocalversion 2>/dev/null || true
             else
               # 6.6+ 清空 setlocalversion 输出，避免与 CONFIG_LOCALVERSION 产生双重 KMI 前缀
-              sed -i '$s|echo "$res"|echo ""|' ./scripts/setlocalversion 2>/dev/null || true
+              sed -i '$s/^echo .*/echo ""/' ./scripts/setlocalversion 2>/dev/null || true
             fi
             # 6.6+ 通过 CONFIG_LOCALVERSION 注入版本名称
             sed -i "/^CONFIG_LOCALVERSION=/ s/=\"[^\"]*\"/=\"${KMI_LOCAL}\"/" ./arch/arm64/configs/gki_defconfig 2>/dev/null || true
