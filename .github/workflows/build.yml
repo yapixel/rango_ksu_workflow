@@ -413,13 +413,13 @@ jobs:
                 case "$variant_input" in
                   "Next") ;; # Next 使用硬编码分支，不需要 BRANCH
                   "SukiSU") BRANCH="-s builtin" ;;
-                  "Official"|"MKSU") BRANCH="-s main" ;;
+                  "Official"|"MKSU"|"MidoriSU") BRANCH="-s main" ;;
                   *) BRANCH="-" ;;
                 esac
                 ;;
               "Dev(开发)")
                 case "$variant_input" in
-                  "Official"|"MKSU") BRANCH="-s main" ;;
+                  "Official"|"MKSU"|"MidoriSU") BRANCH="-s main" ;;
                   "Next") ;; # Next 使用硬编码分支，不需要 BRANCH
                   "SukiSU") BRANCH="-s builtin" ;;
                   *) echo "未知变体: $variant_input" >&2; exit 1 ;;
@@ -485,6 +485,24 @@ jobs:
               echo "添加 MKSU..."
               curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash $BRANCH
 
+              # 计算并设置 KSU 版本号
+              cd KernelSU
+              KSU_GIT_VERSION=$(git rev-list --count HEAD)
+              KSU_VERSION=$((20000 + KSU_GIT_VERSION))
+              echo "KSU_VERSION=$KSU_VERSION" >> $GITHUB_ENV
+              echo "计算的 KSU 版本号: $KSU_VERSION"
+
+              # 更新 Kbuild 中的版本号
+              if [ -f "kernel/Kbuild" ]; then
+                sed -i "s/DKSU_VERSION=16/DKSU_VERSION=${KSU_VERSION}/" kernel/Kbuild
+                echo "已更新 kernel/Kbuild 中的版本号"
+              fi
+              cd ..
+              ;;
+            "MidoriSU")
+              echo "添加 MidoriSU..."
+              curl -LSs "https://raw.githubusercontent.com/midori01/KernelSU/main/kernel/setup.sh" | bash $BRANCH
+              
               # 计算并设置 KSU 版本号
               cd KernelSU
               KSU_GIT_VERSION=$(git rev-list --count HEAD)
@@ -586,7 +604,7 @@ jobs:
           cp $SUSFS4KSU/kernel_patches/include/linux/* ./common/include/linux/
 
           case "${{ inputs.ksu_variant }}" in
-            "Official"|"MKSU")
+            "Official"|"MKSU"|"MidoriSU")
               cd ./KernelSU
               cp $SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
 
@@ -614,7 +632,7 @@ jobs:
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           # 应用版本特定修复 (所有 KSU 变体)
-          if [ "${{ inputs.ksu_variant }}" == "Official" ] || [ "${{ inputs.ksu_variant }}" == "MKSU" ] || [ "${{ inputs.ksu_variant }}" == "Next" ] || [ "${{ inputs.ksu_variant }}" == "SukiSU" ] || [ "${{ inputs.ksu_variant }}" == "ReSukiSU" ]; then
+          if [ "${{ inputs.ksu_variant }}" == "Official" ] || [ "${{ inputs.ksu_variant }}" == "MKSU" ] || [ "${{ inputs.ksu_variant }}" == "MidoriSU" ] || [ "${{ inputs.ksu_variant }}" == "Next" ] || [ "${{ inputs.ksu_variant }}" == "SukiSU" ] || [ "${{ inputs.ksu_variant }}" == "ReSukiSU" ]; then
             CURRENT_SUB="${{ inputs.sub_level }}"
             if [[ ! "$CURRENT_SUB" =~ ^[0-9]+$ ]]; then
               CURRENT_SUB=99999
