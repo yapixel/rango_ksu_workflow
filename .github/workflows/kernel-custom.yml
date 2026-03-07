@@ -101,7 +101,7 @@ on:
         description: "禁用 SUSFS"
         required: true
         type: boolean
-        default: true
+        default: false
       supp_op:
         description: "启用一加 8E 支持"
         required: false
