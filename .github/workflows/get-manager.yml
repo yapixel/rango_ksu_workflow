@@ -77,10 +77,10 @@ jobs:
             git clone https://github.com/midori01/ReSukiSU.git KernelSU
           elif [ "${{ inputs.kernelsu_variant }}" == "Official" ]; then
             echo "This is the Official variant"
-            git clone https://github.com/tiann/KernelSU.git KernelSU
+            git clone https://github.com/azkx/KernelSU.git KernelSU
           elif [ "${{ inputs.kernelsu_variant }}" == "MKSU" ]; then
             echo "This is the MKSU variant"
-            git clone https://github.com/azkx/KernelSU.git KernelSU
+            git clone https://github.com/5ec1cff/KernelSU.git KernelSU
           elif [ "${{ inputs.kernelsu_variant }}" == "MidoriSU" ]; then
             echo "This is the MidoriSU variant"
             git clone https://github.com/midori01/KernelSU.git KernelSU
@@ -135,11 +135,11 @@ jobs:
             KSUM="Manager"
           elif [ "${{ inputs.kernelsu_variant }}" == "MKSU" ]; then
             echo "MKSU..."
-            REPO="azkx/KernelSU"
+            REPO="5ec1cff/KernelSU"
             KSUM="manager"
           elif [ "${{ inputs.kernelsu_variant }}" == "Official" ]; then
             echo "KSU..."
-            REPO="tiann/KernelSU"
+            REPO="azkx/KernelSU"
             KSUM="manager"
           elif [ "${{ inputs.kernelsu_variant }}" == "MidoriSU" ]; then
             echo "MidoriSU..."
