@@ -96,7 +96,7 @@ on:
         description: "启用 KPM 功能"
         required: true
         type: boolean
-        default: true
+        default: false
       cancel_susfs:
         description: "禁用 SUSFS"
         required: true
