@@ -316,8 +316,8 @@ jobs:
 
           NEEDS_FIX=false
           if [[ "${{ inputs.android_version }}" == "android13" && "${{ inputs.kernel_version }}" == "5.10" && $CURRENT_SUB -le 186 ]] ||
-             [[ "${{ inputs.android_version }}" == "android13" && "${{ inputs.kernel_version }}" == "5.15" && $CURRENT_SUB -le 119 ]] ||
-             [[ "${{ inputs.android_version }}" == "android14" && "${{ inputs.kernel_version }}" == "6.1" && $CURRENT_SUB -le 43 ]]; then
+          [[ "${{ inputs.android_version }}" == "android13" && "${{ inputs.kernel_version }}" == "5.15" && $CURRENT_SUB -le 119 ]] ||
+          [[ "${{ inputs.android_version }}" == "android14" && "${{ inputs.kernel_version }}" == "6.1" && $CURRENT_SUB -le 43 ]]; then
             NEEDS_FIX=true
           fi
 
@@ -534,15 +534,22 @@ jobs:
           cp $SUSFS4KSU/kernel_patches/include/linux/* ./common/include/linux/
 
           case "${{ inputs.ksu_variant }}" in
-            "Official"|"MKSU"|"MidoriSU")
+            "Official"|"MKSU")
               cd ./KernelSU
               cp $SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
 
               sed -i 's|kernel/Makefile|kernel/Kbuild|g' ./10_enable_susfs_for_ksu.patch
               sed -i 's|^@@ .* format:.*|@@ -94,4 +94,13 @@|' ./10_enable_susfs_for_ksu.patch
-              sed -i 's|.*check-format:.*| ccflags-y += -Wno-strict-prototypes -Wno-int-conversion -Wno-gcc-compat -Wno-missing-prototypes|' ./10_enable_susfs_for_ksu.patch
-              sed -i 's|.*clang-format --dry-run.*| ccflags-y += -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-variable|' ./10_enable_susfs_for_ksu.patch
+              sed -i 's|.*check-format:.*|ccflags-y += -Wno-strict-prototypes -Wno-int-conversion -Wno-gcc-compat -Wno-missing-prototypes|' ./10_enable_susfs_for_ksu.patch
+              sed -i 's|.*clang-format --dry-run.*|ccflags-y += -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-variable|' ./10_enable_susfs_for_ksu.patch
 
+              patch -p1 < 10_enable_susfs_for_ksu.patch || true
+              cd ..
+              ;;
+            "MidoriSU")
+              cd ./KernelSU
+              echo "下载并应用 MidoriSU 的专属 SUSFS 补丁..."
+              curl -LSs "https://raw.githubusercontent.com/yapixel/kernel_patches/refs/heads/dev/kowsu/10_enable_susfs_for_ksu.patch" -o 10_enable_susfs_for_ksu.patch
               patch -p1 < 10_enable_susfs_for_ksu.patch || true
               cd ..
               ;;
